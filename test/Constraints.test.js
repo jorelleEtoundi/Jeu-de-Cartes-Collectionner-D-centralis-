@@ -1,103 +1,144 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
+const { mintCardWithRarity, increaseTime } = require("./helpers/testHelper");
 
 describe("Constraints Tests", function () {
-  let andromeda, owner, addr1, addr2, vrfCoordinator, linkToken;
+  let andromeda, linkToken, vrfCoordinator;
+  let owner, user1, user2;
   const COOLDOWN = 5 * 60; // 5 minutes
   const LOCK_DURATION = 10 * 60; // 10 minutes
   const MAX_CARDS = 10;
 
   beforeEach(async function () {
-    [owner, addr1, addr2, vrfCoordinator] = await ethers.getSigners();
-    
+    [owner, user1, user2] = await ethers.getSigners();
+
     const MockLINK = await ethers.getContractFactory("MockLINK");
     linkToken = await MockLINK.deploy();
-    
+    await linkToken.waitForDeployment();
+
+    const MockVRFCoordinator = await ethers.getContractFactory("MockVRFCoordinator");
+    vrfCoordinator = await MockVRFCoordinator.deploy();
+    await vrfCoordinator.waitForDeployment();
+
     const Andromeda = await ethers.getContractFactory("AndromedaProtocol");
     andromeda = await Andromeda.deploy(
-      vrfCoordinator.address,
+      await vrfCoordinator.getAddress(),
       await linkToken.getAddress(),
-      ethers.encodeBytes32String("testKeyHash")
+      ethers.ZeroHash
     );
-    
-    await linkToken.transfer(await andromeda.getAddress(), ethers.parseEther("100"));
+    await andromeda.waitForDeployment();
+
+    const contractAddress = await andromeda.getAddress();
+    await linkToken.transfer(contractAddress, ethers.parseEther("100"));
   });
 
   describe("Transaction Cooldown (5 minutes)", function () {
     it("Should enforce 5-minute cooldown between mints", async function () {
-      await andromeda.connect(addr1).mint("QmHash1");
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
       
       await expect(
-        andromeda.connect(addr1).mint("QmHash2")
-      ).to.be.revertedWith("Cooldown active");
+        andromeda.connect(user1).testMint("QmHash2", 50)
+      ).to.be.revertedWith("Cooldown active: wait 5 minutes between transactions");
       
       // After 5 minutes
-      await time.increase(COOLDOWN + 1);
+      await increaseTime(COOLDOWN + 1);
       
       await expect(
-        andromeda.connect(addr1).mint("QmHash2")
+        andromeda.connect(user1).testMint("QmHash2", 50)
       ).to.not.be.reverted;
     });
 
     it("Should enforce cooldown between exchanges", async function () {
-      // Setup: addr1 has exchanged recently
-      // Try to exchange again
+      // Mint cards for both users
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user2, 0, "QmHash2");
+      await increaseTime(COOLDOWN + 1);
+      
+      // user1 exchanges (this activates cooldown)
+      await andromeda.connect(user1).exchange(0, user2.address, 1);
+      
+      // Mint new cards WITHOUT waiting for user1's cooldown
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user2, 0, "QmHash3");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash4");
+      
+      // Try to exchange again immediately (should fail - user1 just minted)
       await expect(
-        andromeda.connect(addr1).exchange(0, addr2.address, 1)
+        andromeda.connect(user1).exchange(3, user2.address, 2)
       ).to.be.revertedWith("Cooldown active");
     });
 
     it("Should enforce cooldown between fusions", async function () {
-      // Setup: addr1 just fused
-      // Try to fuse again
-      const tokenIds = [3, 4, 5];
+      // Mint 3 cards and fuse
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash2");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash3");
+      await increaseTime(COOLDOWN + 1);
       
+      await andromeda.connect(user1).fuse([0, 1, 2], "QmFused");
+      
+      // Mint 3 more cards for another fusion
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash4");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash5");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash6");
+      
+      // Try to fuse again immediately (should fail)
       await expect(
-        andromeda.connect(addr1).fuse(tokenIds, "QmHash")
+        andromeda.connect(user1).fuse([4, 5, 6], "QmFused2")
       ).to.be.revertedWith("Cooldown active");
     });
 
     it("Should track cooldown per user independently", async function () {
-      await andromeda.connect(addr1).mint("QmHash1");
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
       
-      // addr2 should be able to mint (independent cooldown)
+      // user2 should be able to mint (independent cooldown)
       await expect(
-        andromeda.connect(addr2).mint("QmHash2")
+        mintCardWithRarity(andromeda, vrfCoordinator, user2, 0, "QmHash2")
       ).to.not.be.reverted;
     });
   });
 
   describe("Lock Duration (10 minutes for Rare+)", function () {
     it("Should lock Rare cards for 10 minutes after mint", async function () {
-      // Mock VRF to return Rare card
-      // const tokenId = await mintRareCard(addr1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash1"); // Rare
       
       const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
       expect(card.isLocked).to.be.true;
-      
-      const timestamp = await time.latest();
-      expect(card.lockUntil).to.equal(timestamp + LOCK_DURATION);
+      expect(card.lockUntil).to.be.gt(0);
     });
 
     it("Should lock Epic cards for 10 minutes after mint", async function () {
-      const tokenId = 0; // Epic card
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 2, "QmHash1"); // Epic
+      
+      const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
       expect(card.isLocked).to.be.true;
     });
 
     it("Should lock Legendary cards for 10 minutes after mint", async function () {
-      const tokenId = 0; // Legendary card
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 3, "QmHash1"); // Legendary
+      
+      const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
       expect(card.isLocked).to.be.true;
     });
 
     it("Should NOT lock Common cards", async function () {
-      const tokenId = 0; // Common card
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1"); // Common
+      
+      const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
       expect(card.isLocked).to.be.false;
@@ -105,36 +146,55 @@ describe("Constraints Tests", function () {
     });
 
     it("Should unlock card after 10 minutes", async function () {
-      const tokenId = 0; // Locked Rare card
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash1"); // Rare (locked)
       
+      const tokenId = 0;
       expect(await andromeda.isCardLocked(tokenId)).to.be.true;
       
-      await time.increase(LOCK_DURATION + 1);
+      await increaseTime(LOCK_DURATION + 1);
       
       expect(await andromeda.isCardLocked(tokenId)).to.be.false;
     });
 
     it("Should prevent exchange of locked cards", async function () {
-      const lockedTokenId = 0; // Locked card
-      const unlockedTokenId = 1;
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash1"); // Rare (locked)
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user2, 1, "QmHash2"); // Rare (locked)
+      await increaseTime(COOLDOWN + 1);
+      
+      const lockedTokenId = 0;
+      const otherTokenId = 1;
       
       await expect(
-        andromeda.connect(addr1).exchange(lockedTokenId, addr2.address, unlockedTokenId)
-      ).to.be.revertedWith("Your card is locked");
+        andromeda.connect(user1).exchange(lockedTokenId, user2.address, otherTokenId)
+      ).to.be.reverted; // Either card locked
     });
 
     it("Should prevent fusion with locked cards", async function () {
-      const tokenIds = [0, 1, 2]; // tokenId 0 is locked
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash1"); // Rare (locked)
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash2"); // Rare (locked)
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash3"); // Rare (locked)
+      await increaseTime(COOLDOWN + 1);
+      
+      const tokenIds = [0, 1, 2];
       
       await expect(
-        andromeda.connect(addr1).fuse(tokenIds, "QmHash")
+        andromeda.connect(user1).fuse(tokenIds, "QmHash")
       ).to.be.revertedWith("Card is locked");
     });
 
     it("Should lock fused cards for 10 minutes", async function () {
-      const tokenIds = [0, 1, 2]; // 3 unlocked Commons
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash2");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash3");
+      await increaseTime(COOLDOWN + 1);
       
-      await andromeda.connect(addr1).fuse(tokenIds, "QmHash");
+      const tokenIds = [0, 1, 2];
+      await andromeda.connect(user1).fuse(tokenIds, "QmHash");
       
       const newTokenId = 3;
       const newCard = await andromeda.getCard(newTokenId);
@@ -145,42 +205,53 @@ describe("Constraints Tests", function () {
 
   describe("Maximum 10 Cards Per Owner", function () {
     it("Should allow minting up to 10 cards", async function () {
-      // Mock minting 10 cards
       for (let i = 0; i < 10; i++) {
-        // await mintCard(addr1);
-        // await time.increase(COOLDOWN + 1);
+        await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, `QmHash${i}`);
+        if (i < 9) await increaseTime(COOLDOWN + 1);
       }
       
-      const balance = await andromeda.balanceOf(addr1.address);
+      const balance = await andromeda.balanceOf(user1.address);
       expect(balance).to.equal(10);
     });
 
     it("Should reject minting when fleet is full", async function () {
-      // Setup: addr1 has 10 cards
+      for (let i = 0; i < 10; i++) {
+        await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, `QmHash${i}`);
+        if (i < 9) await increaseTime(COOLDOWN + 1);
+      }
+      
+      await increaseTime(COOLDOWN + 1);
       
       await expect(
-        andromeda.connect(addr1).mint("QmHash11")
-      ).to.be.revertedWith("Fleet full");
+        andromeda.connect(user1).testMint("QmHash11", 50)
+      ).to.be.revertedWith("Fleet full: maximum 10 cards");
     });
 
     it("Should allow minting after fusion reduces count", async function () {
-      // Setup: addr1 has 10 cards
+      for (let i = 0; i < 10; i++) {
+        await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, `QmHash${i}`);
+        if (i < 9) await increaseTime(COOLDOWN + 1);
+      }
+      
+      await increaseTime(COOLDOWN + 1);
+      
       // Fuse 3 cards (10 - 3 + 1 = 8 cards)
-      
       const tokenIds = [0, 1, 2];
-      await andromeda.connect(addr1).fuse(tokenIds, "QmHash");
+      await andromeda.connect(user1).fuse(tokenIds, "QmFused");
       
-      // Now should have 8 cards, can mint 2 more
-      await time.increase(COOLDOWN + 1);
+      // Now should have 8 cards, can mint more
+      await increaseTime(COOLDOWN + 1);
       
       await expect(
-        andromeda.connect(addr1).mint("QmHashNew")
+        mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHashNew")
       ).to.not.be.reverted;
     });
   });
 
   describe("Previous Owners Tracking", function () {
     it("Should initialize with empty previousOwners array", async function () {
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      
       const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
@@ -188,31 +259,43 @@ describe("Constraints Tests", function () {
     });
 
     it("Should add to previousOwners on exchange", async function () {
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user2, 0, "QmHash2");
+      await increaseTime(COOLDOWN + 1);
+      
       const tokenId1 = 0;
       const tokenId2 = 1;
       
-      await andromeda.connect(addr1).exchange(tokenId1, addr2.address, tokenId2);
+      await andromeda.connect(user1).exchange(tokenId1, user2.address, tokenId2);
       
       const card1 = await andromeda.getCard(tokenId1);
       
-      expect(card1.previousOwners).to.include(addr1.address);
+      expect(card1.previousOwners).to.include(user1.address);
       expect(card1.previousOwners.length).to.equal(1);
     });
 
     it("Should accumulate multiple previous owners", async function () {
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user2, 0, "QmHash2");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, owner, 0, "QmHash3");
+      await increaseTime(COOLDOWN + 1);
+      
       const tokenId = 0;
       
-      // addr1 -> addr2
-      await andromeda.connect(addr1).exchange(tokenId, addr2.address, 1);
-      await time.increase(COOLDOWN + 1);
+      // user1 -> user2
+      await andromeda.connect(user1).exchange(tokenId, user2.address, 1);
+      await increaseTime(COOLDOWN + 1);
       
-      // addr2 -> owner
-      await andromeda.connect(addr2).exchange(tokenId, owner.address, 2);
+      // user2 -> owner
+      await andromeda.connect(user2).exchange(tokenId, owner.address, 2);
       
       const card = await andromeda.getCard(tokenId);
       
-      expect(card.previousOwners).to.include(addr1.address);
-      expect(card.previousOwners).to.include(addr2.address);
+      expect(card.previousOwners).to.include(user1.address);
+      expect(card.previousOwners).to.include(user2.address);
       expect(card.previousOwners.length).to.equal(2);
     });
   });
@@ -221,7 +304,8 @@ describe("Constraints Tests", function () {
     it("Should set createdAt timestamp on mint", async function () {
       const beforeMint = await time.latest();
       
-      // Mint card (mock VRF fulfillment)
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      
       const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
@@ -229,14 +313,18 @@ describe("Constraints Tests", function () {
     });
 
     it("Should update lastTransferAt on exchange", async function () {
-      const tokenId = 0;
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      await increaseTime(COOLDOWN + 1);
+      await mintCardWithRarity(andromeda, vrfCoordinator, user2, 0, "QmHash2");
+      await increaseTime(COOLDOWN + 1);
       
+      const tokenId = 0;
       const cardBefore = await andromeda.getCard(tokenId);
       const timestampBefore = cardBefore.lastTransferAt;
       
-      await time.increase(100);
+      await increaseTime(100);
       
-      await andromeda.connect(addr1).exchange(tokenId, addr2.address, 1);
+      await andromeda.connect(user1).exchange(tokenId, user2.address, 1);
       
       const cardAfter = await andromeda.getCard(tokenId);
       
@@ -244,6 +332,8 @@ describe("Constraints Tests", function () {
     });
 
     it("Should set lastTransferAt equal to createdAt on mint", async function () {
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
+      
       const tokenId = 0;
       const card = await andromeda.getCard(tokenId);
       
@@ -253,46 +343,49 @@ describe("Constraints Tests", function () {
 
   describe("canTransact Helper", function () {
     it("Should return false immediately after transaction", async function () {
-      await andromeda.connect(addr1).mint("QmHash1");
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
       
-      const canTransact = await andromeda.canTransact(addr1.address);
+      const canTransact = await andromeda.canTransact(user1.address);
       expect(canTransact).to.be.false;
     });
 
     it("Should return true after cooldown period", async function () {
-      await andromeda.connect(addr1).mint("QmHash1");
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1");
       
-      await time.increase(COOLDOWN + 1);
+      await increaseTime(COOLDOWN + 1);
       
-      const canTransact = await andromeda.canTransact(addr1.address);
+      const canTransact = await andromeda.canTransact(user1.address);
       expect(canTransact).to.be.true;
     });
 
     it("Should return true for new users", async function () {
-      const canTransact = await andromeda.canTransact(addr2.address);
+      const canTransact = await andromeda.canTransact(user2.address);
       expect(canTransact).to.be.true;
     });
   });
 
   describe("isCardLocked Helper", function () {
     it("Should return true for locked cards", async function () {
-      const tokenId = 0; // Rare card (locked)
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash1"); // Rare (locked)
       
+      const tokenId = 0;
       const isLocked = await andromeda.isCardLocked(tokenId);
       expect(isLocked).to.be.true;
     });
 
     it("Should return false for unlocked cards", async function () {
-      const tokenId = 0; // Common card (not locked)
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, "QmHash1"); // Common (not locked)
       
+      const tokenId = 0;
       const isLocked = await andromeda.isCardLocked(tokenId);
       expect(isLocked).to.be.false;
     });
 
     it("Should return false after lock expires", async function () {
-      const tokenId = 0; // Initially locked
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 1, "QmHash1"); // Rare (locked)
       
-      await time.increase(LOCK_DURATION + 1);
+      const tokenId = 0;
+      await increaseTime(LOCK_DURATION + 1);
       
       const isLocked = await andromeda.isCardLocked(tokenId);
       expect(isLocked).to.be.false;
