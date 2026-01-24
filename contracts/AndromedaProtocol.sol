@@ -73,6 +73,7 @@ contract AndromedaProtocol is ERC721, ERC721Enumerable, Ownable, VRFConsumerBase
     
     // ========== CHAINLINK VRF ==========
     
+    address internal vrfCoordinator;
     bytes32 internal keyHash;
     
     // ========== EVENTS ==========
@@ -100,6 +101,7 @@ contract AndromedaProtocol is ERC721, ERC721Enumerable, Ownable, VRFConsumerBase
         Ownable(msg.sender)
         VRFConsumerBase(_vrfCoordinator, _linkToken)
     {
+        vrfCoordinator = _vrfCoordinator;
         keyHash = _keyHash;
         
         // Initialize rarity values
@@ -398,7 +400,56 @@ contract AndromedaProtocol is ERC721, ERC721Enumerable, Ownable, VRFConsumerBase
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         return string(abi.encodePacked("ipfs://", cards[tokenId].ipfsHash));
     }
-    
+    // ========== TEST FUNCTIONS (Remove in production) ==========
+
+    /**
+    * @notice Test-only function to mint with controlled randomness
+    * @dev ONLY for testing - remove before production deployment
+    */
+    function testMint(string memory _ipfsHash, uint256 randomness) external returns (uint256) {
+        require(balanceOf(msg.sender) < MAX_CARDS_PER_OWNER, "Fleet full: maximum 10 cards");
+        require(
+            block.timestamp >= lastTransactionTime[msg.sender] + TRANSACTION_COOLDOWN,
+            "Cooldown active: wait 5 minutes between transactions"
+        );
+        
+        // Generate rarity and race from randomness
+        Rarity rarity = _generateRarity(randomness);
+        Race race = _generateRace(randomness);
+        
+        // Mint the NFT
+        uint256 tokenId = _tokenIdCounter;
+        _tokenIdCounter++;
+        
+        _safeMint(msg.sender, tokenId);
+        
+        // Create the card
+        bool shouldLock = rarity >= Rarity.Rare;
+        uint256 lockTime = shouldLock ? block.timestamp + LOCK_DURATION : 0;
+        
+        cards[tokenId] = Card({
+            name: _generateName(race, rarity),
+            race: race,
+            rarity: rarity,
+            value: rarityValues[rarity],
+            ipfsHash: _ipfsHash,
+            previousOwners: new address[](0),
+            createdAt: block.timestamp,
+            lastTransferAt: block.timestamp,
+            isLocked: shouldLock,
+            lockUntil: lockTime
+        });
+        
+        lastTransactionTime[msg.sender] = block.timestamp;
+        
+        emit CardMinted(tokenId, msg.sender, race, rarity);
+        
+        if (shouldLock) {
+            emit CardLocked(tokenId, lockTime);
+        }
+        
+        return tokenId;
+    }
     // ========== REQUIRED OVERRIDES ==========
     
     function _update(address to, uint256 tokenId, address auth)
