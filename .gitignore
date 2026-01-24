@@ -1,46 +1,49 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
 
 # Environment variables
 .env
 .env.local
 .env.production
 
-# Build outputs
-dist/
+# Hardhat files
+cache/
+artifacts/
+typechain-types/
+
+# Coverage
+coverage/
+coverage.json
+
+# Gas reports
+gas-report.txt
+
+# Build filesA
 build/
-out/
-*.log
+dist/
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Hardhat
-cache/
-artifacts/
-coverage/
-typechain/
-typechain-types/
-
-# Solana/Anchor
-.anchor/
-target/
-**/*.rs.bk
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Testing
-coverage.json
-.coverage_artifacts/
-.coverage_cache/
-.coverage_contracts/
+.nyc_output/
 
-# IPFS
-.ipfs/
+# Misc
+*.tgz
+.npm
+.eslintcache
