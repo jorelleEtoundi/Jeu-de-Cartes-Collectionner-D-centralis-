@@ -1,0 +1,184 @@
+{
+  "humans": {
+    "common": {
+      "imageHash": "QmYDMUnwA22TPrdEnvDjKYGFwAXUe5X8U4wXW4jPUVwj3b",
+      "metadataHash": "QmP5zLW2PNdAAYa3EDMzjE9peCKQiw43uXjKtCFc4cjRYK",
+      "imageUrl": "ipfs://QmYDMUnwA22TPrdEnvDjKYGFwAXUe5X8U4wXW4jPUVwj3b",
+      "metadataUrl": "ipfs://QmP5zLW2PNdAAYa3EDMzjE9peCKQiw43uXjKtCFc4cjRYK"
+    },
+    "rare": {
+      "imageHash": "QmXPA1KVWbpDRevkegSQbVPNkbUyuxmpgmnJ3VthYKaM9T",
+      "metadataHash": "QmTcQzQAMKUmBaGWAj7ncKHHiXLwMNevc7SdahF6AaQtKc",
+      "imageUrl": "ipfs://QmXPA1KVWbpDRevkegSQbVPNkbUyuxmpgmnJ3VthYKaM9T",
+      "metadataUrl": "ipfs://QmTcQzQAMKUmBaGWAj7ncKHHiXLwMNevc7SdahF6AaQtKc"
+    },
+    "epic": {
+      "imageHash": "QmZWCK8xYtsNJXv3vDWxqNvHo2EVsW2Pdifc6cciVSj3b8",
+      "metadataHash": "QmWwLc1tPdX6M9NyYFDVgxdDxxcbHjCLTb57MZ22EoVuAU",
+      "imageUrl": "ipfs://QmZWCK8xYtsNJXv3vDWxqNvHo2EVsW2Pdifc6cciVSj3b8",
+      "metadataUrl": "ipfs://QmWwLc1tPdX6M9NyYFDVgxdDxxcbHjCLTb57MZ22EoVuAU"
+    },
+    "legendary": {
+      "imageHash": "QmUjJSHzfBow5yTf87KiFch5LMWohNnNkjqjoy6Bn8mDBM",
+      "metadataHash": "QmVHgJSJibkka1xEU1a5Ypj2CWu2QJHFfRbFjjykDwsVJz",
+      "imageUrl": "ipfs://QmUjJSHzfBow5yTf87KiFch5LMWohNnNkjqjoy6Bn8mDBM",
+      "metadataUrl": "ipfs://QmVHgJSJibkka1xEU1a5Ypj2CWu2QJHFfRbFjjykDwsVJz"
+    }
+  },
+  "zephyrs": {
+    "common": {
+      "imageHash": "QmeBwAo6DisFLLfR3SnCuB87iAqGy6hXTsUQmS17dH3cSX",
+      "metadataHash": "QmQffQC3HTAVKtzfe5fWwqeKYDC93rDV1WLQcPwJzRwXLD",
+      "imageUrl": "ipfs://QmeBwAo6DisFLLfR3SnCuB87iAqGy6hXTsUQmS17dH3cSX",
+      "metadataUrl": "ipfs://QmQffQC3HTAVKtzfe5fWwqeKYDC93rDV1WLQcPwJzRwXLD"
+    },
+    "rare": {
+      "imageHash": "QmQ8FEME4EaMczYs7P8MLpihLmqavomn97ChoEHRSVgasH",
+      "metadataHash": "Qme1sfwL8jvzDJVgJkcj7vvDHeF3LCCPSBYMa5mfED3yJq",
+      "imageUrl": "ipfs://QmQ8FEME4EaMczYs7P8MLpihLmqavomn97ChoEHRSVgasH",
+      "metadataUrl": "ipfs://Qme1sfwL8jvzDJVgJkcj7vvDHeF3LCCPSBYMa5mfED3yJq"
+    },
+    "epic": {
+      "imageHash": "QmYCJDNDC3da5nhF9rukrd3FXw23bgMqbuy9qNnfqQaMXZ",
+      "metadataHash": "QmXs1JLLiERPuqNjbu9Z3CBHk9Wra3qxr4qJUNokuEQEGt",
+      "imageUrl": "ipfs://QmYCJDNDC3da5nhF9rukrd3FXw23bgMqbuy9qNnfqQaMXZ",
+      "metadataUrl": "ipfs://QmXs1JLLiERPuqNjbu9Z3CBHk9Wra3qxr4qJUNokuEQEGt"
+    },
+    "legendary": {
+      "imageHash": "QmXRhhE3PKufajwuhACH4mdChzZMkSSeBfZ2pkoEfCa1Jg",
+      "metadataHash": "QmcGgEGisN85TuWfcXLKEALG7n7Z1nda162G2m6YBzjrcB",
+      "imageUrl": "ipfs://QmXRhhE3PKufajwuhACH4mdChzZMkSSeBfZ2pkoEfCa1Jg",
+      "metadataUrl": "ipfs://QmcGgEGisN85TuWfcXLKEALG7n7Z1nda162G2m6YBzjrcB"
+    }
+  },
+  "kraths": {
+    "common": {
+      "imageHash": "QmU8W4GQHm6FMkarR7oFebreVhYjUj1eS1PG7H1SPokNVd",
+      "metadataHash": "Qmaaoydink9QvC2vhjcCNFnakCivCFkg1ZkSMCS93ryEGa",
+      "imageUrl": "ipfs://QmU8W4GQHm6FMkarR7oFebreVhYjUj1eS1PG7H1SPokNVd",
+      "metadataUrl": "ipfs://Qmaaoydink9QvC2vhjcCNFnakCivCFkg1ZkSMCS93ryEGa"
+    },
+    "rare": {
+      "imageHash": "QmUCDkWbpefXX5NADCCL2RPPvM9LxwGNNX1mveKzGuG9wE",
+      "metadataHash": "QmSZCiyA4mCQ1iY8AP9271ekRMFy15DSnpuqxNhzYHMZt4",
+      "imageUrl": "ipfs://QmUCDkWbpefXX5NADCCL2RPPvM9LxwGNNX1mveKzGuG9wE",
+      "metadataUrl": "ipfs://QmSZCiyA4mCQ1iY8AP9271ekRMFy15DSnpuqxNhzYHMZt4"
+    },
+    "epic": {
+      "imageHash": "QmX3xuKXHstoCc2hB3Bqgm3j1SyGAXTptRm1MQDirWrm5G",
+      "metadataHash": "QmSN3aVt4Z9B1CstaQd3CS462mfbnuvcnCt74MMHvNqKxC",
+      "imageUrl": "ipfs://QmX3xuKXHstoCc2hB3Bqgm3j1SyGAXTptRm1MQDirWrm5G",
+      "metadataUrl": "ipfs://QmSN3aVt4Z9B1CstaQd3CS462mfbnuvcnCt74MMHvNqKxC"
+    },
+    "legendary": {
+      "imageHash": "QmYcXz1k4rTNny5ReoQ1APHRApVfAoZ4JSf7NLorXNqea3",
+      "metadataHash": "QmXdS7CWeN7Jt83GXqat5nSrKc7XRYABBVseCxtHxVsiDu",
+      "imageUrl": "ipfs://QmYcXz1k4rTNny5ReoQ1APHRApVfAoZ4JSf7NLorXNqea3",
+      "metadataUrl": "ipfs://QmXdS7CWeN7Jt83GXqat5nSrKc7XRYABBVseCxtHxVsiDu"
+    }
+  },
+  "preservers": {
+    "common": {
+      "imageHash": "QmYBuQR893WJiGta2LPXLe1mJJnrz3Ez2m2JYHCJGX1URC",
+      "metadataHash": "QmZ22ZxZoAGJ4ZTb5zqvQzkFEEso17LXeTZXu3MGw1ads6",
+      "imageUrl": "ipfs://QmYBuQR893WJiGta2LPXLe1mJJnrz3Ez2m2JYHCJGX1URC",
+      "metadataUrl": "ipfs://QmZ22ZxZoAGJ4ZTb5zqvQzkFEEso17LXeTZXu3MGw1ads6"
+    },
+    "rare": {
+      "imageHash": "QmSfUdUqzJG8NjF3KeitnXK8VxUK1rVTDsnjVLHAizkefF",
+      "metadataHash": "QmYTa7Gn8NzuzgDgxdXCWFn4EvcUsMnH3ErUagaF2F8PXE",
+      "imageUrl": "ipfs://QmSfUdUqzJG8NjF3KeitnXK8VxUK1rVTDsnjVLHAizkefF",
+      "metadataUrl": "ipfs://QmYTa7Gn8NzuzgDgxdXCWFn4EvcUsMnH3ErUagaF2F8PXE"
+    },
+    "epic": {
+      "imageHash": "QmTGDg3rzRsBKNcvQYSmTXFu9P1ZFTN6dpTMBMiaQ5YHts",
+      "metadataHash": "QmV4C3MteDHoQFVz1VfLpay9GqtcteUwTze962bf9wU4B9",
+      "imageUrl": "ipfs://QmTGDg3rzRsBKNcvQYSmTXFu9P1ZFTN6dpTMBMiaQ5YHts",
+      "metadataUrl": "ipfs://QmV4C3MteDHoQFVz1VfLpay9GqtcteUwTze962bf9wU4B9"
+    },
+    "legendary": {
+      "imageHash": "QmeGZYCayTH5rfqMDkBGHQ5HMnfJLmYmwWxLFq5DBU5K5u",
+      "metadataHash": "QmcntUeqHBN8h86yB8HNz8x8ugaTxX7KCqvRrY3QFxfZw2",
+      "imageUrl": "ipfs://QmeGZYCayTH5rfqMDkBGHQ5HMnfJLmYmwWxLFq5DBU5K5u",
+      "metadataUrl": "ipfs://QmcntUeqHBN8h86yB8HNz8x8ugaTxX7KCqvRrY3QFxfZw2"
+    }
+  },
+  "synthetics": {
+    "common": {
+      "imageHash": "QmNh6wy28phqgxKyjyxpFxbeGPUBLCTByKeGwkEtRBaNKu",
+      "metadataHash": "QmPcKDYMczA3bwHC4zPtefoJ9SFUSfcX6y9Cv2FyxLoFtb",
+      "imageUrl": "ipfs://QmNh6wy28phqgxKyjyxpFxbeGPUBLCTByKeGwkEtRBaNKu",
+      "metadataUrl": "ipfs://QmPcKDYMczA3bwHC4zPtefoJ9SFUSfcX6y9Cv2FyxLoFtb"
+    },
+    "rare": {
+      "imageHash": "QmPDmvHhrRtF5q8oMmSJbqnAEewq8BVLUsKBfEVxBW2fKi",
+      "metadataHash": "QmVrRsyt2eace3Qgs1HS5Jjupjujp5f7rusWiCfBj21VXf",
+      "imageUrl": "ipfs://QmPDmvHhrRtF5q8oMmSJbqnAEewq8BVLUsKBfEVxBW2fKi",
+      "metadataUrl": "ipfs://QmVrRsyt2eace3Qgs1HS5Jjupjujp5f7rusWiCfBj21VXf"
+    },
+    "epic": {
+      "imageHash": "QmZ7kbm9pEkhy8ygMaUpti4n8H8aMtYCgjn6wWMdCoZfsq",
+      "metadataHash": "QmWap5U2wHrVoS3XirjxjgfPWwkrLEwz8KPeJagXArQkjp",
+      "imageUrl": "ipfs://QmZ7kbm9pEkhy8ygMaUpti4n8H8aMtYCgjn6wWMdCoZfsq",
+      "metadataUrl": "ipfs://QmWap5U2wHrVoS3XirjxjgfPWwkrLEwz8KPeJagXArQkjp"
+    },
+    "legendary": {
+      "imageHash": "QmernB1cRTKbtBEfJR1WcAxiQDTdP4JJEE9AFNAnJp4Jk2",
+      "metadataHash": "QmYRJMFwkrmMSAxsmdWknADq5jb3uJu1EAALvXSkpmFJv6",
+      "imageUrl": "ipfs://QmernB1cRTKbtBEfJR1WcAxiQDTdP4JJEE9AFNAnJp4Jk2",
+      "metadataUrl": "ipfs://QmYRJMFwkrmMSAxsmdWknADq5jb3uJu1EAALvXSkpmFJv6"
+    }
+  },
+  "aquarians": {
+    "common": {
+      "imageHash": "QmQKetGKgcfUtubvTjMnwk4vp1nqNpgDTR31Jz1CrTqejE",
+      "metadataHash": "Qmd58izNNSNNCyyEwNXRXTWTjC5YbEfyfvtapqcVDe1zXY",
+      "imageUrl": "ipfs://QmQKetGKgcfUtubvTjMnwk4vp1nqNpgDTR31Jz1CrTqejE",
+      "metadataUrl": "ipfs://Qmd58izNNSNNCyyEwNXRXTWTjC5YbEfyfvtapqcVDe1zXY"
+    },
+    "rare": {
+      "imageHash": "QmYfXsZ7B5HFHWzD1Nef94NNC2DEPbB2kYxe5rzihuP3q5",
+      "metadataHash": "QmXDFQcizgzHEZ8U91WmUF19WhJAX383avSJnhmPQFGVc1",
+      "imageUrl": "ipfs://QmYfXsZ7B5HFHWzD1Nef94NNC2DEPbB2kYxe5rzihuP3q5",
+      "metadataUrl": "ipfs://QmXDFQcizgzHEZ8U91WmUF19WhJAX383avSJnhmPQFGVc1"
+    },
+    "epic": {
+      "imageHash": "QmaV4RiqKbbwT7L4TLDMhABP3n3hff6Db3FGQwDmx83Qqb",
+      "metadataHash": "QmWBgRFwBZYitJiqV4MB5s47gA3hXJ6nmYd2vhy8c6yEgX",
+      "imageUrl": "ipfs://QmaV4RiqKbbwT7L4TLDMhABP3n3hff6Db3FGQwDmx83Qqb",
+      "metadataUrl": "ipfs://QmWBgRFwBZYitJiqV4MB5s47gA3hXJ6nmYd2vhy8c6yEgX"
+    },
+    "legendary": {
+      "imageHash": "QmdacRScpyJtH1uohR5Q9opE1ohSTbxWwACMyjP446MxdU",
+      "metadataHash": "QmStnevno7LefbMhE7fkSQGiJ21aD6tL9vcaFKWpfFsmoa",
+      "imageUrl": "ipfs://QmdacRScpyJtH1uohR5Q9opE1ohSTbxWwACMyjP446MxdU",
+      "metadataUrl": "ipfs://QmStnevno7LefbMhE7fkSQGiJ21aD6tL9vcaFKWpfFsmoa"
+    }
+  },
+  "ancients": {
+    "common": {
+      "imageHash": "QmcbNm17So8VuVV7cq3PoocJnhdqZAAPmSA2VFmHGMZX8y",
+      "metadataHash": "QmSL6dQ7HxRMzJrHRUnK593Nu2TwwqrpjGNKUXxP1svG42",
+      "imageUrl": "ipfs://QmcbNm17So8VuVV7cq3PoocJnhdqZAAPmSA2VFmHGMZX8y",
+      "metadataUrl": "ipfs://QmSL6dQ7HxRMzJrHRUnK593Nu2TwwqrpjGNKUXxP1svG42"
+    },
+    "rare": {
+      "imageHash": "QmQFfsxDBfacCArd43x284rqXBx25CJ6qfnc29zMEVS7yZ",
+      "metadataHash": "QmXGwK78ZgXByD15DgiiBT2mGt7NU5dP59WoBfYD4hbsnE",
+      "imageUrl": "ipfs://QmQFfsxDBfacCArd43x284rqXBx25CJ6qfnc29zMEVS7yZ",
+      "metadataUrl": "ipfs://QmXGwK78ZgXByD15DgiiBT2mGt7NU5dP59WoBfYD4hbsnE"
+    },
+    "epic": {
+      "imageHash": "Qme3a4PEBgFrMZv8KPV8s1J5mBF6uWdn2Hc35orraVUi9w",
+      "metadataHash": "QmXGrhNhavhcVWcHkmiBQ4HsK9vXbhESLLSqDbcWiwKLCm",
+      "imageUrl": "ipfs://Qme3a4PEBgFrMZv8KPV8s1J5mBF6uWdn2Hc35orraVUi9w",
+      "metadataUrl": "ipfs://QmXGrhNhavhcVWcHkmiBQ4HsK9vXbhESLLSqDbcWiwKLCm"
+    },
+    "legendary": {
+      "imageHash": "Qme8v7yePNJx1ts7QRAetffyTiZWPi3gBW3iP9iaQyVyvn",
+      "metadataHash": "QmSk9V3E9bLrsDTfvcPuDxnftxUpP54ZgTbLZFrBiJmwR8",
+      "imageUrl": "ipfs://Qme8v7yePNJx1ts7QRAetffyTiZWPi3gBW3iP9iaQyVyvn",
+      "metadataUrl": "ipfs://QmSk9V3E9bLrsDTfvcPuDxnftxUpP54ZgTbLZFrBiJmwR8"
+    }
+  }
+}
