@@ -47,3 +47,13 @@ yarn-error.log*
 *.tgz
 .npm
 .eslintcache
+
+
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+ipfs-hashes.json
+.DS_Store
