@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/diffo/Downloads/web/Jeu-de-Cartes/c/frontend/pages/_app.js"],"sourcesContent":["import { useEffect, useState } from 'react';\nimport '../styles/globals.css';\nimport '../styles/modern.css';\n\nfunction MyApp({ Component, pageProps }) {\n  const [mounted, setMounted] = useState(false);\n\n  useEffect(() => {\n    setMounted(true);\n  }, []);\n\n  // Empêcher le rendu jusqu'à ce que le client soit montage\n  if (!mounted) {\n    return null;\n  }\n\n  return <Component {...pageProps} />;\n}\n\nexport default MyApp;\n"],"names":[],"mappings":";;;;;AAAA;;;;;AAIA,SAAS,MAAM,EAAE,SAAS,EAAE,SAAS,EAAE;IACrC,MAAM,CAAC,SAAS,WAAW,GAAG,IAAA,+GAAQ,EAAC;IAEvC,IAAA,gHAAS,EAAC;QACR,WAAW;IACb,GAAG,EAAE;IAEL,0DAA0D;IAC1D,IAAI,CAAC,SAAS;QACZ,OAAO;IACT;IAEA,qBAAO,qKAAC;QAAW,GAAG,SAAS;;;;;;AACjC;uCAEe"}}]
-}

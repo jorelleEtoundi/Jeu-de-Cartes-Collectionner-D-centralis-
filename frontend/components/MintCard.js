@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getContract } from '../utils/web3Utils';
+import { getContract, getContractReadOnly, handleTransactionError } from '../utils/web3Utils';
 import ipfsHashes from '../public/ipfs-hashes.json';
 
 // Informations sur les 7 races aliens
@@ -93,7 +93,7 @@ export default function MintCard({ account, onMintSuccess }) {
     const listenForCardMinted = async () => {
       try {
         console.log(`👂 Configuration du listener CardMinted...`);
-        const contract = await getContract();
+        const contract = getContractReadOnly();
         
         // Créer un filter pour l'événement CardMinted
         // Paramètres: (tokenId, owner, race, rarity)
@@ -149,17 +149,13 @@ export default function MintCard({ account, onMintSuccess }) {
 
   const checkCooldownAndBalance = async () => {
     try {
-      const contract = await getContract();
-      
-      // Vérifier le cooldown
-      const lastTx = await contract.lastTransactionTime(account);
-      const now = Math.floor(Date.now() / 1000);
-      const remaining = Math.max(0, 300 - (now - Number(lastTx)));
-      setCooldown(remaining);
+      // ✅ Lecture via Alchemy (pas MetaMask)
+      const contract = getContractReadOnly();
 
-      // Vérifier le nombre de cartes
+      // ✅ Juste balanceOf — lastTransactionTime n'existe pas dans le contrat
       const balance = await contract.balanceOf(account);
       setCardBalance(Number(balance));
+      setCooldown(0);
     } catch (error) {
       console.error("Erreur lors de la vérification:", error);
     }

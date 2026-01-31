@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { RACE_NAMES, RARITY_NAMES, RARITY_COLORS } from '../utils/contractConfig';
 import { formatTimestamp, isCardLocked, getIPFSUrl } from '../utils/web3Utils';
 
+// ✅ Préfixes cohérents avec les rarités (corrige le bug du contrat)
+const RARITY_PREFIXES = {
+  0: "Scout",
+  1: "Elite",
+  2: "Epic",
+  3: "Legendary"
+};
+
 export default function CardDisplay({ card, tokenId, onSelect, selected }) {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -10,11 +18,14 @@ export default function CardDisplay({ card, tokenId, onSelect, selected }) {
 
   const raceNumber = typeof card.race === 'object' ? card.race._hex ? parseInt(card.race._hex, 16) : card.race : card.race;
   const rarityNumber = typeof card.rarity === 'object' ? card.rarity._hex ? parseInt(card.rarity._hex, 16) : card.rarity : card.rarity;
-  
+
   const raceName = RACE_NAMES[raceNumber] || 'Unknown';
   const rarityName = RARITY_NAMES[rarityNumber] || 'Unknown';
   const rarityColor = RARITY_COLORS[rarityNumber] || '#9CA3AF';
-  
+
+  // ✅ On reconstruit le nom à partir de la rareté et la race (ignore card.name qui est buggé dans le contrat)
+  const displayName = `${RARITY_PREFIXES[rarityNumber] || 'Unknown'} ${raceName} Vessel`;
+
   const locked = card.isLocked && isCardLocked(card.lockUntil);
   const imageUrl = getIPFSUrl(card.ipfsHash);
 
@@ -25,7 +36,7 @@ export default function CardDisplay({ card, tokenId, onSelect, selected }) {
   };
 
   return (
-    <div 
+    <div
       className={`card-item ${selected ? 'selected' : ''} ${locked ? 'locked' : ''}`}
       onClick={handleClick}
       style={{ borderColor: rarityColor }}
@@ -44,9 +55,9 @@ export default function CardDisplay({ card, tokenId, onSelect, selected }) {
                 <div className="spinner"></div>
               </div>
             )}
-            <img 
-              src={imageUrl} 
-              alt={card.name}
+            <img
+              src={imageUrl}
+              alt={displayName}
               className={`card-image ${imageLoading ? 'loading' : ''}`}
               onLoad={() => setImageLoading(false)}
               onError={() => {
@@ -65,7 +76,7 @@ export default function CardDisplay({ card, tokenId, onSelect, selected }) {
 
       {/* Informations de la carte */}
       <div className="card-info">
-        <h3 className="card-name">{card.name}</h3>
+        <h3 className="card-name">{displayName}</h3>
         <p className="card-race">Race: {raceName}</p>
         <p className="card-value">Valeur: {card.value?.toString() || '0'}</p>
         <p className="card-id">Token ID: #{tokenId}</p>

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { getContract, handleTransactionError, formatAddress } from '../utils/web3Utils';
-import { RARITY } from '../utils/config';
+import { getContract, getContractReadOnly, handleTransactionError, getAllTokenIds, getCardDetails } from '../utils/web3Utils';
 import CardDisplay from './CardDisplay';
 
 export default function ExchangeCards({ account, userCards, onExchangeSuccess }) {
@@ -28,29 +27,24 @@ export default function ExchangeCards({ account, userCards, onExchangeSuccess })
     setError('');
 
     try {
-      const contract = await getContract();
-      const balance = await contract.balanceOf(otherUserAddress);
-      const balanceNum = Number(balance);
+      // ✅ Utilise getAllTokenIds + getCardDetails (lecture via Alchemy, pas MetaMask)
+      const tokenIds = await getAllTokenIds(otherUserAddress);
 
-      const cards = [];
-      for (let i = 0; i < balanceNum; i++) {
-        const tokenId = await contract.tokenOfOwnerByIndex(otherUserAddress, i);
-        const cardData = await contract.cards(tokenId);
-        
-        cards.push({
-          tokenId: tokenId.toString(),
-          name: cardData.name,
-          race: cardData.race,
-          rarity: cardData.rarity,
-          value: cardData.value,
-          ipfsHash: cardData.ipfsHash,
-          isLocked: cardData.isLocked,
-          lockUntil: Number(cardData.lockUntil)
-        });
+      if (tokenIds.length === 0) {
+        setError('Cet utilisateur n\'a aucune carte');
+        setOtherUserCards([]);
+        setIsLoading(false);
+        return;
       }
 
-      setOtherUserCards(cards);
+      const cards = await Promise.all(
+        tokenIds.map((tokenId) => getCardDetails(tokenId))
+      );
+
+      const validCards = cards.filter(Boolean);
+      setOtherUserCards(validCards);
     } catch (error) {
+      console.error('Erreur chargement cartes:', error);
       setError('Impossible de charger les cartes');
     } finally {
       setIsLoading(false);
@@ -64,6 +58,7 @@ export default function ExchangeCards({ account, userCards, onExchangeSuccess })
     setError('');
 
     try {
+      // ✅ getContract() avec await — utilisé SEULEMENT pour écrire (MetaMask signe)
       const contract = await getContract();
       const tx = await contract.exchange(
         selectedMyCard.tokenId,
@@ -99,8 +94,9 @@ export default function ExchangeCards({ account, userCards, onExchangeSuccess })
             <CardDisplay
               key={card.tokenId}
               card={card}
+              tokenId={card.tokenId}
               onSelect={() => setSelectedMyCard(card)}
-              isSelected={selectedMyCard?.tokenId === card.tokenId}
+              selected={selectedMyCard?.tokenId === card.tokenId}
             />
           ))}
         </div>
@@ -128,8 +124,9 @@ export default function ExchangeCards({ account, userCards, onExchangeSuccess })
               <CardDisplay
                 key={card.tokenId}
                 card={card}
+                tokenId={card.tokenId}
                 onSelect={() => setSelectedOtherCard(card)}
-                isSelected={selectedOtherCard?.tokenId === card.tokenId}
+                selected={selectedOtherCard?.tokenId === card.tokenId}
               />
             ))}
           </div>
