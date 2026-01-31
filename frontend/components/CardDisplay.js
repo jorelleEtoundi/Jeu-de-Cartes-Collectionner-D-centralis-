@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RACE_NAMES, RARITY_NAMES, RARITY_COLORS } from '../utils/contractConfig';
-import { formatTimestamp, isCardLocked, getIPFSUrl } from '../utils/web3Utils';
+import { formatTimestamp, isCardLocked } from '../utils/web3Utils';
 
 // ✅ Préfixes cohérents avec les rarités (corrige le bug du contrat)
 const RARITY_PREFIXES = {
@@ -8,6 +8,36 @@ const RARITY_PREFIXES = {
   1: "Elite",
   2: "Epic",
   3: "Legendary"
+};
+
+// ✅ Noms des races en minuscule pour correspondre aux dossiers d'images du backend
+const RACE_FOLDERS = {
+  0: "humans",
+  1: "zephyrs",
+  2: "kraths",
+  3: "preservers",
+  4: "synthetics",
+  5: "aquarians",
+  6: "ancients"
+};
+
+// ✅ Noms des rarités en minuscule pour correspondre aux fichiers d'images
+const RARITY_FILES = {
+  0: "common",
+  1: "rare",
+  2: "epic",
+  3: "legendary"
+};
+
+/**
+ * ✅ Construit l'URL de l'image via le backend local
+ * Format : http://localhost:3001/images/zephyrs/epic.png
+ */
+const getImageUrl = (raceNumber, rarityNumber) => {
+  const race = RACE_FOLDERS[raceNumber];
+  const rarity = RARITY_FILES[rarityNumber];
+  if (!race || !rarity) return null;
+  return `http://localhost:3001/images/${race}/${rarity}.png`;
 };
 
 export default function CardDisplay({ card, tokenId, onSelect, selected }) {
@@ -23,11 +53,13 @@ export default function CardDisplay({ card, tokenId, onSelect, selected }) {
   const rarityName = RARITY_NAMES[rarityNumber] || 'Unknown';
   const rarityColor = RARITY_COLORS[rarityNumber] || '#9CA3AF';
 
-  // ✅ On reconstruit le nom à partir de la rareté et la race (ignore card.name qui est buggé dans le contrat)
+  // ✅ Nom reconstruit cohérent avec la rareté
   const displayName = `${RARITY_PREFIXES[rarityNumber] || 'Unknown'} ${raceName} Vessel`;
 
   const locked = card.isLocked && isCardLocked(card.lockUntil);
-  const imageUrl = getIPFSUrl(card.ipfsHash);
+
+  // ✅ URL de l'image via le backend (pas IPFS)
+  const imageUrl = getImageUrl(raceNumber, rarityNumber);
 
   const handleClick = () => {
     if (onSelect && !locked) {

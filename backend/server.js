@@ -3,22 +3,24 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-
 const app = express();
 
-// ✅ CORS : autorise Vite (5173) + requêtes cross-domain
+// ✅ CORS : autorise Vite (5173) + Next.js (3000) + requêtes cross-domain
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"],
     methods: ["GET", "POST", "OPTIONS"],
   })
 );
 app.use(express.json());
 
+// ✅ Sert les images statiques depuis le dossier images/
+// URL : http://localhost:3001/images/zephyrs/epic.png
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 // ✅ Charge ipfs-hashes.json proprement
 const ipfsPath = path.join(__dirname, "ipfs-hashes.json");
 let ipfsHashes = null;
-
 function loadHashes() {
   if (!fs.existsSync(ipfsPath)) {
     console.error("❌ ipfs-hashes.json introuvable :", ipfsPath);
@@ -26,7 +28,6 @@ function loadHashes() {
     ipfsHashes = null;
     return;
   }
-
   try {
     const raw = fs.readFileSync(ipfsPath, "utf-8");
     ipfsHashes = JSON.parse(raw);
@@ -46,7 +47,6 @@ app.get("/health", (req, res) => {
 // ✅ Toutes les cartes (guide: GET /api/cards)
 app.get("/api/cards", (req, res) => {
   if (!ipfsHashes) return res.status(500).json({ error: "Hashes not loaded" });
-
   const allCards = [];
   for (const [race, rarities] of Object.entries(ipfsHashes)) {
     for (const [rarity, data] of Object.entries(rarities)) {
@@ -59,27 +59,21 @@ app.get("/api/cards", (req, res) => {
 // ✅ Carte spécifique (guide: GET /api/cards/:race/:rarity)
 app.get("/api/cards/:race/:rarity", (req, res) => {
   if (!ipfsHashes) return res.status(500).json({ error: "Hashes not loaded" });
-
   const { race, rarity } = req.params;
   if (!ipfsHashes[race] || !ipfsHashes[race][rarity]) {
     return res.status(404).json({ error: "Card not found" });
   }
-
   res.json({ id: `${race}-${rarity}`, race, rarity, ...ipfsHashes[race][rarity] });
 });
 
 // ✅ Hash aléatoire pour mint (guide: GET /api/random-metadata)
 app.get("/api/random-metadata", (req, res) => {
   if (!ipfsHashes) return res.status(500).json({ error: "Hashes not loaded" });
-
   const races = Object.keys(ipfsHashes);
   const randomRace = races[Math.floor(Math.random() * races.length)];
-
   const rarities = Object.keys(ipfsHashes[randomRace]);
   const randomRarity = rarities[Math.floor(Math.random() * rarities.length)];
-
   const card = ipfsHashes[randomRace][randomRarity];
-
   res.json({
     metadataHash: card.metadataHash,
     race: randomRace,
