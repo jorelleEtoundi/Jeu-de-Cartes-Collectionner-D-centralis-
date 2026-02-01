@@ -29,7 +29,6 @@ export default function NetworkStatus() {
       if (isCorrect) {
         setNetworkName('Sepolia');
       } else {
-        // Essayer de récupérer le nom du réseau actuel
         const networkNames = {
           '0x1': 'Ethereum',
           '0x5': 'Goerli',

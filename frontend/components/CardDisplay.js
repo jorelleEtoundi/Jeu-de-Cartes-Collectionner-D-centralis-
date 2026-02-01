@@ -53,12 +53,12 @@ export default function CardDisplay({ card, tokenId, onSelect, selected }) {
   const rarityName = RARITY_NAMES[rarityNumber] || 'Unknown';
   const rarityColor = RARITY_COLORS[rarityNumber] || '#9CA3AF';
 
-  // ✅ Nom reconstruit cohérent avec la rareté
+  // Nom reconstruit cohérent avec la rareté
   const displayName = `${RARITY_PREFIXES[rarityNumber] || 'Unknown'} ${raceName} Vessel`;
 
   const locked = card.isLocked && isCardLocked(card.lockUntil);
 
-  // ✅ URL de l'image via le backend (pas IPFS)
+  // URL de l'image via le backend (pas IPFS)
   const imageUrl = getImageUrl(raceNumber, rarityNumber);
 
   const handleClick = () => {

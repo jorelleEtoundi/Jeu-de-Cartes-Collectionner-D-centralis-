@@ -8,7 +8,6 @@ const path = require("path");
 async function main() {
   console.log("📦 Exporting ABI for frontend team...\n");
 
-  // Path to compiled contract
   const contractPath = path.join(
     __dirname,
     "../artifacts/contracts/AndromedaProtocol.sol/AndromedaProtocol.json"
@@ -20,10 +19,8 @@ async function main() {
     process.exit(1);
   }
 
-  // Read contract artifact
   const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
 
-  // Extract ABI
   const abi = contract.abi;
 
   console.log("✅ ABI extracted successfully");

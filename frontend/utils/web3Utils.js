@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { CONTRACT_ADDRESS, NETWORK_CONFIG } from './contractConfig';
 import AndromedaProtocolABI from '../abi/AndromedaProtocol.json';
 
-// ✅ RPC Alchemy direct — utilisé pour toutes les LECTURES (NE PAS TOUCHER)
+// RPC Alchemy direct — utilisé pour toutes les LECTURES
 const ALCHEMY_RPC = 'https://eth-sepolia.g.alchemy.com/v2/-3XOQCj4AU1nDKEvYqKn4';
 
 /* -------------------------------------------------------------------------- */
@@ -92,7 +92,7 @@ export const getProvider = () => getReadOnlyProvider();
 /* -------------------------------------------------------------------------- */
 
 /**
- * ✅ LA correction clé :
+ * LA correction clé :
  * Utilise ERC721Enumerable :
  * balanceOf(owner) + tokenOfOwnerByIndex(owner, i)
  *
@@ -105,7 +105,7 @@ export const getAllTokenIds = async (address) => {
 
     // 1) Méthode fiable : ERC721Enumerable
     try {
-      const bal = await contract.balanceOf(owner); // bigint
+      const bal = await contract.balanceOf(owner); 
       const n = Number(bal);
 
       if (Number.isFinite(n) && n > 0) {
@@ -118,7 +118,6 @@ export const getAllTokenIds = async (address) => {
       console.warn('[getAllTokenIds] ERC721Enumerable failed, fallback...', e?.message);
     }
 
-    // 2) Fallback : ton helper custom (si jamais)
     if (contract.getUserCards) {
       try {
         const ids = await contract.getUserCards(owner);
@@ -200,6 +199,17 @@ export const getRemainingCooldown = (lastTransactionTime, cooldownDuration = 300
   return remaining <= 0 ? 0 : remaining;
 };
 
+
+export const fetchCooldownRemaining = async (address) => {
+  try {
+    const contract = getContractReadOnly();
+    const lastTx = await contract.lastTransactionTime(address);
+    return getRemainingCooldown(Number(lastTx), 300);
+  } catch (e) {
+    console.error('[fetchCooldownRemaining]', e);
+    return 0;
+  }
+};
 export const formatCooldown = (seconds) => {
   const s = Number(seconds || 0);
   if (s <= 0) return 'Disponible';

@@ -97,8 +97,6 @@ export const getFullCardData = async (card) => {
 export const getRandomIPFSHash = () => {
   const races = Object.keys(ipfsHashes);
   const rarities = ['common', 'rare', 'epic', 'legendary'];
-  
-  // Sélection aléatoire (pour simulation, le vrai random sera fait par VRF)
   const randomRace = races[Math.floor(Math.random() * races.length)];
   const randomRarity = rarities[Math.floor(Math.random() * rarities.length)];
   

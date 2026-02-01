@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getContract, getContractReadOnly, handleTransactionError } from '../utils/web3Utils';
+import { getContract, getContractReadOnly, handleTransactionError, fetchCooldownRemaining } from '../utils/web3Utils';
 import ipfsHashes from '../public/ipfs-hashes.json';
 
 // Informations sur les 7 races aliens
@@ -67,13 +67,13 @@ export default function MintCard({ account, onMintSuccess }) {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
   const [confirmationBlocks, setConfirmationBlocks] = useState(0);
   const [txHash, setTxHash] = useState('');
-  const [progressStep, setProgressStep] = useState(''); // "selectionning", "confirming", "waiting", "vrf", "finalizing"
+  const [progressStep, setProgressStep] = useState(''); 
   const [progressMessage, setProgressMessage] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [cooldown, setCooldown] = useState(0);
   const [cardBalance, setCardBalance] = useState(0);
-  const [useTestMint, setUseTestMint] = useState(true); // Mode test par défaut
+  const [useTestMint, setUseTestMint] = useState(true); 
 
   useEffect(() => {
     if (account) {
@@ -156,15 +156,13 @@ export default function MintCard({ account, onMintSuccess }) {
 
   const checkCooldownAndBalance = async () => {
     try {
-      // ✅ Lecture via Alchemy (pas MetaMask)
       const contract = getContractReadOnly();
-
-      // ✅ Juste balanceOf — lastTransactionTime n'existe pas dans le contrat
       const balance = await contract.balanceOf(account);
       setCardBalance(Number(balance));
-      setCooldown(0);
+      const remaining = await fetchCooldownRemaining(account);
+      setCooldown(remaining);
     } catch (error) {
-      console.error("Erreur lors de la vérification:", error);
+      console.error('Erreur lors de la verification:', error);
     }
   };
 
@@ -191,7 +189,6 @@ export default function MintCard({ account, onMintSuccess }) {
       
       if (!hash) {
         console.warn(`Hash non trouvé pour ${randomRace} - ${rarity}`);
-        // Fallback: essayer de récupérer n'importe quel hash disponible
         const firstRace = races[0];
         const firstRarity = Object.keys(ipfsHashes[firstRace])[0];
         return ipfsHashes[firstRace][firstRarity].metadataHash;
@@ -232,7 +229,7 @@ export default function MintCard({ account, onMintSuccess }) {
       
       // Étape 1: Sélection des attributs
       setProgressMessage('🎲 Tirage aléatoire de la race et rareté...');
-      await new Promise(r => setTimeout(r, 500)); // Simulation d'attente
+      await new Promise(r => setTimeout(r, 500)); 
       
       const ipfsHash = getRandomIPFSHash();
 
@@ -250,7 +247,6 @@ export default function MintCard({ account, onMintSuccess }) {
       let isVRFMode = false;
       
       if (useTestMint) {
-        // Utiliser testMint pour les tests (ne nécessite pas VRF)
         setProgressStep('confirming');
         setProgressMessage('📤 Transaction en cours...\n🦊 Vérification par Metamask');
         
@@ -268,8 +264,6 @@ export default function MintCard({ account, onMintSuccess }) {
           setTxHash(tx.hash);
           setProgressMessage(`✅ Transaction envoyée!\n⏳ Blockchain en cours...`);
           setSuccess(`✅ Transaction reçue!\n⏳ En attente de confirmation...\n🔗 ${tx.hash.substring(0, 20)}...`);
-          
-          // Attendre la confirmation
           const receipt = await tx.wait();
           
           console.log(`✅ Confirmée! Block: ${receipt.blockNumber}`);

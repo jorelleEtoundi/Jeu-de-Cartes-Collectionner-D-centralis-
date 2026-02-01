@@ -58,7 +58,6 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
         setError("Cet utilisateur n'a aucune carte");
         return;
       }
-      // normalise tokenId
       setOtherUserCards(
         cards.map((c) => ({
           ...c,
@@ -78,8 +77,6 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
   const handleExchange = async (e) => {
     e?.preventDefault?.();
     e?.stopPropagation?.();
-
-    // ✅ debug : tu verras dans la console si le clic part
     console.log('[EXCHANGE] click', {
       selectedMyCard,
       selectedOtherCard,
@@ -105,9 +102,6 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
 
     try {
       const read = getContractReadOnly();
-
-      // ✅ pré-checks utiles : si ça revert, tu auras un message clair AVANT MetaMask
-      // 1) vérifier ownership des deux tokens
       const ownerMy = await read.ownerOf(selectedMyCard.tokenId);
       if (ownerMy.toLowerCase() !== account.toLowerCase()) {
         throw new Error("Vous n'êtes plus le propriétaire de votre carte sélectionnée.");
@@ -118,7 +112,6 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
         throw new Error("L'autre utilisateur n'est plus le propriétaire de la carte sélectionnée.");
       }
 
-      // 2) cooldown (si ton contrat bloque les transactions trop fréquentes)
       if (read.canTransact) {
         const canMe = await read.canTransact(account);
         if (!canMe) {
@@ -130,7 +123,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
         }
       }
 
-      // ✅ envoi transaction
+      //  envoi transaction
       const contract = await getContract();
       const tx = await contract.exchange(
         selectedMyCard.tokenId,
@@ -152,7 +145,6 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
       if (onRefreshMyCards) setTimeout(() => onRefreshMyCards(), 1000);
     } catch (err) {
       console.error('[EXCHANGE] error', err);
-      // si c'est un revert/estimateGas, handleTransactionError te renverra quelque chose de lisible
       setError(handleTransactionError(err) || err?.message || "Erreur lors de l'échange");
     } finally {
       setIsExchanging(false);
@@ -163,7 +155,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
     <div className="exchange-container">
       <h2>🔄 Échanger des Cartes</h2>
 
-      {/* ✅ messages toujours visibles */}
+      {/* messages toujours visibles */}
       {(error || success) && (
         <div className={`toast ${error ? 'toast-error' : 'toast-success'}`}>
           {error || success}
@@ -266,7 +258,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
         </div>
       )}
 
-      {/* ✅ bouton en zone haute priorité (anti overlay) */}
+      {/* bouton en zone haute priorité (anti overlay) */}
       <div className="btn-zone">
         <button
           onClick={handleExchange}
@@ -287,7 +279,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
       <style>{`
         .exchange-container { max-width: 1200px; margin: 0 auto; padding: 12px; }
 
-        /* ✅ toast sticky pour voir les erreurs même si on scroll */
+        /* toast sticky pour voir les erreurs même si on scroll */
         .toast {
           position: sticky;
           top: 10px;
@@ -306,7 +298,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
 
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
 
-        /* ✅ anti overlays */
+        /* anti overlays */
         .card-pick { position: relative; border-radius: 14px; cursor: pointer; overflow: hidden; isolation: isolate; }
         .card-inner { position: relative; z-index: 1; }
         .card-pick.is-selected { box-shadow: 0 0 0 3px rgba(16,185,129,0.55), 0 10px 24px rgba(0,0,0,0.25); transform: translateY(-2px); }
@@ -315,7 +307,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
                  display: grid; place-items: center; font-weight: 900;
                  background: rgba(16,185,129,0.9); color: white; z-index: 5; pointer-events: none; }
 
-        /* ✅ input au-dessus */
+        /* input au-dessus */
         .address-section { z-index: 9999; }
         .address-row { display: flex; gap: 12px; align-items: center; position: relative; z-index: 10000; }
         .address-input {
@@ -325,7 +317,7 @@ export default function ExchangeCards({ account, userCards = [], onRefreshMyCard
         }
         .btn-load { padding: 1rem 1.2rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 800; z-index: 10001; }
 
-        /* ✅ bouton au-dessus de tout */
+        /* bouton au-dessus de tout */
         .btn-zone { position: relative; z-index: 999999; pointer-events: auto; }
         .btn-exchange {
           width: 100%;

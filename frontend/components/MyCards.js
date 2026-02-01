@@ -20,7 +20,6 @@ export default function MyCards({ account, refreshTrigger }) {
     setError('');
 
     try {
-      // Petit délai pour s'assurer que la blockchain a finalisé la transaction
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const tokenIds = await getAllTokenIds(account);

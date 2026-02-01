@@ -2,7 +2,7 @@
 export const CONTRACT_ADDRESS = "0x317Fbed8fD8491B080f98A8e3540A6cb190908d7";
 
 export const NETWORK_CONFIG = {
-  chainId: "0xaa36a7", // 11155111 en hexadécimal (Sepolia)
+  chainId: "0xaa36a7", 
   chainName: "Sepolia Test Network",
   rpcUrls: [
     "https://rpc.sepolia.org",
@@ -22,10 +22,10 @@ export const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/";
 
 // Valeurs des raretés
 export const RARITY_VALUES = {
-  0: 100,   // Common
-  1: 300,   // Rare
-  2: 700,   // Epic
-  3: 1000   // Legendary
+  0: 100,   
+  1: 300,   
+  2: 700,   
+  3: 1000   
 };
 
 // Noms des races
@@ -49,8 +49,8 @@ export const RARITY_NAMES = {
 
 // Couleurs pour chaque rareté (pour l'UI)
 export const RARITY_COLORS = {
-  0: "#9CA3AF", // Gray pour Common
-  1: "#3B82F6", // Blue pour Rare
-  2: "#8B5CF6", // Purple pour Epic
-  3: "#F59E0B"  // Gold pour Legendary
+  0: "#9CA3AF", 
+  1: "#3B82F6",
+  2: "#8B5CF6", 
+  3: "#F59E0B"  
 };

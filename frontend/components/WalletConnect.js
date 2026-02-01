@@ -15,14 +15,8 @@ export default function WalletConnect({ onConnect }) {
 
   useEffect(() => {
     if (!mounted) return;
-
-    // Vérifier si déjà connecté au chargement
     checkConnection();
-    
-    // Mettre en place les listeners de réseau et compte
     setupNetworkListener();
-
-    // Écouter les changements de compte
     if (typeof window !== 'undefined' && window.ethereum) {
       window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
@@ -49,26 +43,21 @@ export default function WalletConnect({ onConnect }) {
   };
 
   const handleAccountsChanged = (accounts) => {
-    // Ignorer l'événement si l'utilisateur vient de se déconnecter intentionnellement
     if (isDisconnectingRef.current) {
       isDisconnectingRef.current = false;
       return;
     }
 
     if (accounts.length === 0) {
-      // Tous les comptes sont déconnectés
       setAccount(null);
       if (onConnect) onConnect(null);
       setShowMenu(false);
       setError('');
     } else if (account && accounts[0] !== account) {
-      // Le compte a CHANGÉ - déconnexion automatique nécessaire
       console.log(`Account changed from ${account} to ${accounts[0]} - Auto disconnecting`);
       
-      // Montrer notification
       setError('Compte Metamask changé. Veuillez vous reconnecter.');
       
-      // Déconnexion propre
       setTimeout(() => {
         setAccount(null);
         if (onConnect) onConnect(null);
@@ -76,7 +65,6 @@ export default function WalletConnect({ onConnect }) {
         setError('');
       }, 2000);
     } else {
-      // Même compte reste connecté (reconnexion ou app remontée)
       setAccount(accounts[0]);
       if (onConnect) onConnect(accounts[0]);
       setShowMenu(false);

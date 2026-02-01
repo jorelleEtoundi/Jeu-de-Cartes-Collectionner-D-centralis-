@@ -2,7 +2,7 @@
 export const CONTRACT_ADDRESS = "0x317Fbed8fD8491B080f98A8e3540A6cb190908d7";
 
 // Configuration du réseau Sepolia
-export const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111 en hexadécimal
+export const SEPOLIA_CHAIN_ID = "0xaa36a7"; 
 export const SEPOLIA_NETWORK = {
   chainId: SEPOLIA_CHAIN_ID,
   chainName: "Sepolia Testnet",
@@ -43,8 +43,8 @@ export const RARITY_VALUES = {
 
 // Constantes du jeu
 export const MAX_CARDS_PER_OWNER = 10;
-export const TRANSACTION_COOLDOWN = 5 * 60; // 5 minutes en secondes
-export const LOCK_DURATION = 10 * 60; // 10 minutes en secondes
+export const TRANSACTION_COOLDOWN = 5 * 60; 
+export const LOCK_DURATION = 10 * 60; 
 
 // Gateway IPFS
 export const IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/";

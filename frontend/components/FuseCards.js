@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getContract, getUserCardsDetailed, handleTransactionError } from '../utils/web3Utils';
+import { getContract, getUserCardsDetailed, handleTransactionError, fetchCooldownRemaining } from '../utils/web3Utils';
 import CardDisplay from './CardDisplay';
 
 export default function FuseCards({ account, refreshTrigger, onFuseSuccess }) {
   const [cards, setCards] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]); // strings
+  const [selectedIds, setSelectedIds] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [fusing, setFusing] = useState(false);
   const [error, setError] = useState('');
@@ -51,12 +51,12 @@ export default function FuseCards({ account, refreshTrigger, onFuseSuccess }) {
 
     setSelectedIds((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= 3) return prev; // max 3
+      if (prev.length >= 3) return prev; 
       return [...prev, id];
     });
   };
 
-  // ✅ Hash auto (obligatoire côté smart contract)
+  // Hash auto (obligatoire côté smart contract)
   const autoIpfsHash = useMemo(() => {
     if (selectedIds.length === 0) return 'ipfs://placeholder';
     const first = fuseableCards.find((c) => String(c.tokenId) === String(selectedIds[0]));
@@ -89,6 +89,15 @@ export default function FuseCards({ account, refreshTrigger, onFuseSuccess }) {
     setSuccess('');
 
     try {
+      const remaining = await fetchCooldownRemaining(account);
+      if (remaining > 0) {
+        const min = Math.floor(remaining / 60);
+        const sec = remaining % 60;
+        setError('Cooldown actif. Attendez ' + min + 'm ' + sec + 's');
+        setFusing(false);
+        return;
+      }
+
       const contract = await getContract();
 
       // IMPORTANT: array EXACTEMENT de 3 items
@@ -164,12 +173,12 @@ export default function FuseCards({ account, refreshTrigger, onFuseSuccess }) {
         </div>
       </div>
 
-      {/* ✅ Raison si désactivé */}
+      {/* Raison si désactivé */}
       {!canFuse && (
         <div className="alert alert-warning">{disabledReason}</div>
       )}
 
-      {/* ✅ bouton toujours au-dessus */}
+      {/* bouton toujours au-dessus */}
       <div className="btn-zone">
         <button
           onClick={handleFuse}
@@ -190,7 +199,7 @@ export default function FuseCards({ account, refreshTrigger, onFuseSuccess }) {
 
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
 
-        /* ✅ évite overlays */
+        /*  évite overlays */
         .card-pick { position: relative; border-radius: 14px; cursor: pointer; overflow: hidden; isolation: isolate; z-index: 1; }
         .card-inner { position: relative; z-index: 1; }
         .card-pick.is-selected { box-shadow: 0 0 0 3px rgba(16,185,129,0.55), 0 10px 24px rgba(0,0,0,0.25); transform: translateY(-2px); }

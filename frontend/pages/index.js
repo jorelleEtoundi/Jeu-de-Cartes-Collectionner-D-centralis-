@@ -12,7 +12,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('mint');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // ✅ AJOUT : stocker les cartes du wallet connecté
+  // stocker les cartes du wallet connecté
   const [userCards, setUserCards] = useState([]);
   const [cardsLoading, setCardsLoading] = useState(false);
 
@@ -30,7 +30,7 @@ export default function Home() {
     setRefreshTrigger((prev) => prev + 1);
   };
 
-  // ✅ AJOUT : charger/rafraîchir les cartes à chaque changement de compte ou refreshTrigger
+  // charger/rafraîchir les cartes à chaque changement de compte ou refreshTrigger
   useEffect(() => {
     const load = async () => {
       if (!account) return;
@@ -137,7 +137,6 @@ export default function Home() {
           </div>
         ) : (
           <div className="content-area">
-            {/* ✅ petit indicateur de chargement cartes */}
             {cardsLoading && (
               <div style={{ marginBottom: 12, opacity: 0.85 }}>
                 Chargement de vos cartes...
@@ -152,7 +151,6 @@ export default function Home() {
               <MyCards account={account} refreshTrigger={refreshTrigger} />
             )}
 
-            {/* ✅ CORRECTION : on passe userCards + callback refresh */}
             {activeTab === 'exchange' && (
               <ExchangeCards
                 account={account}

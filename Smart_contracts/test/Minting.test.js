@@ -6,22 +6,19 @@ const { mintCardWithRarity, increaseTime } = require("./helpers/testHelper");
 describe("Minting Tests", function () {
   let andromeda, linkToken, vrfCoordinator;
   let owner, user1, user2;
-  const COOLDOWN = 5 * 60; // 5 minutes
+  const COOLDOWN = 5 * 60; 
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
 
-    // Deploy MockLINK
     const MockLINK = await ethers.getContractFactory("MockLINK");
     linkToken = await MockLINK.deploy();
     await linkToken.waitForDeployment();
 
-    // Deploy MockVRFCoordinator
     const MockVRFCoordinator = await ethers.getContractFactory("MockVRFCoordinator");
     vrfCoordinator = await MockVRFCoordinator.deploy();
     await vrfCoordinator.waitForDeployment();
 
-    // Deploy AndromedaProtocol
     const Andromeda = await ethers.getContractFactory("AndromedaProtocol");
     andromeda = await Andromeda.deploy(
       await vrfCoordinator.getAddress(),
@@ -30,7 +27,6 @@ describe("Minting Tests", function () {
     );
     await andromeda.waitForDeployment();
 
-    // Fund contract with LINK
     const contractAddress = await andromeda.getAddress();
     await linkToken.transfer(contractAddress, ethers.parseEther("100"));
   });
@@ -43,7 +39,7 @@ describe("Minting Tests", function () {
       expect(balance).to.equal(1);
       
       const card = await andromeda.getCard(tokenId);
-      expect(card.rarity).to.equal(0); // Common
+      expect(card.rarity).to.equal(0); 
     });
 
     it("Should fail if cooldown is active", async function () {
@@ -65,7 +61,6 @@ describe("Minting Tests", function () {
     });
 
     it("Should fail if fleet is full (10 cards)", async function () {
-      // Mint 10 cards
       for (let i = 0; i < 10; i++) {
         await mintCardWithRarity(andromeda, vrfCoordinator, user1, 0, `QmTest${i}`);
         if (i < 9) await increaseTime(COOLDOWN + 1);
@@ -133,7 +128,7 @@ describe("Minting Tests", function () {
     });
 
     it("Should handle VRF callback correctly", async function () {
-      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 2); // Epic
+      await mintCardWithRarity(andromeda, vrfCoordinator, user1, 2); 
       
       const balance = await andromeda.balanceOf(user1.address);
       expect(balance).to.equal(1);

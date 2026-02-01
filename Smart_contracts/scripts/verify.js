@@ -9,7 +9,6 @@ const path = require("path");
 async function main() {
   console.log("🔍 Starting contract verification...\n");
 
-  // Load deployment info
   const deploymentPath = path.join(__dirname, "../deployments", `${network.name}.json`);
   
   if (!fs.existsSync(deploymentPath)) {
@@ -26,7 +25,6 @@ async function main() {
   console.log("   Deployer:", deploymentInfo.deployer);
   console.log("");
 
-  // Constructor arguments
   const constructorArgs = [
     deploymentInfo.vrfCoordinator,
     deploymentInfo.linkToken,
