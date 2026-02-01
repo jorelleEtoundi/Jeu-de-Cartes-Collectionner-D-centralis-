@@ -2,161 +2,152 @@ import { ethers } from 'ethers';
 import { CONTRACT_ADDRESS, NETWORK_CONFIG } from './contractConfig';
 import AndromedaProtocolABI from '../contracts/AndromedaProtocol.json';
 
-// ✅ RPC Alchemy direct — utilisé pour toutes les LECTURES
+// ✅ RPC Alchemy direct — utilisé pour toutes les LECTURES (NE PAS TOUCHER)
 const ALCHEMY_RPC = 'https://eth-sepolia.g.alchemy.com/v2/-3XOQCj4AU1nDKEvYqKn4';
 
-/**
- * Vérifie si MetaMask est installé
- */
-export const isMetamaskInstalled = () => {
-  return typeof window !== 'undefined' && typeof window.ethereum !== 'undefined';
-};
+/* -------------------------------------------------------------------------- */
+/*                               WALLET / NET                                 */
+/* -------------------------------------------------------------------------- */
 
-/**
- * Connecte le wallet MetaMask
- */
+export const isMetamaskInstalled = () =>
+  typeof window !== 'undefined' && typeof window.ethereum !== 'undefined';
+
 export const connectWallet = async () => {
-  if (!isMetamaskInstalled()) {
-    throw new Error("MetaMask n'est pas installé");
-  }
+  if (!isMetamaskInstalled()) throw new Error("MetaMask n'est pas installé");
 
-  try {
-    const accounts = await window.ethereum.request({ 
-      method: 'eth_requestAccounts' 
-    });
-    
-    await checkAndSwitchNetwork();
-    
-    return accounts[0];
-  } catch (error) {
-    console.error("Erreur lors de la connexion:", error);
-    throw error;
-  }
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+  await checkAndSwitchNetwork();
+  return accounts[0];
 };
 
-/**
- * Vérifie et change de réseau si nécessaire
- */
 export const checkAndSwitchNetwork = async () => {
-  try {
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    
-    if (chainId !== NETWORK_CONFIG.chainId) {
-      try {
+  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+  if (chainId !== NETWORK_CONFIG.chainId) {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: NETWORK_CONFIG.chainId }],
+      });
+    } catch (switchError) {
+      if (switchError.code === 4902) {
         await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: NETWORK_CONFIG.chainId }],
+          method: 'wallet_addEthereumChain',
+          params: [NETWORK_CONFIG],
         });
-      } catch (switchError) {
-        if (switchError.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [NETWORK_CONFIG],
-          });
-        } else {
-          throw switchError;
-        }
+      } else {
+        throw switchError;
       }
     }
-  } catch (error) {
-    console.error("Erreur réseau:", error);
-    throw error;
   }
 };
 
-/**
- * Met en place un listener pour détecter les changements de réseau dans MetaMask.
- * Si l'utilisateur change de réseau vers autre chose que Sepolia, on recharge.
- */
 export const setupNetworkListener = () => {
   if (typeof window === 'undefined' || !window.ethereum) return;
 
-  const handleChainChanged = (chainId) => {
-    console.log('Réseau changé vers:', chainId);
-    if (chainId !== NETWORK_CONFIG.chainId) {
-      console.warn('Réseau changé vers un autre que Sepolia — rechargement');
-      window.location.reload();
-    }
-  };
-
-  window.ethereum.on('chainChanged', handleChainChanged);
+  window.ethereum.on('chainChanged', (chainId) => {
+    if (chainId !== NETWORK_CONFIG.chainId) window.location.reload();
+  });
 };
 
-/**
- * ✅ Provider pour les LECTURES — va DIRECTEMENT vers Alchemy
- *    Ne passe PAS par MetaMask, donc pas d'erreur RPC 522
- */
-export const getReadOnlyProvider = () => {
-  return new ethers.JsonRpcProvider(ALCHEMY_RPC);
-};
+/* -------------------------------------------------------------------------- */
+/*                                 PROVIDERS                                  */
+/* -------------------------------------------------------------------------- */
 
-/**
- * ✅ Provider MetaMask — utilisé SEULEMENT pour signer les transactions
- */
+export const getReadOnlyProvider = () => new ethers.JsonRpcProvider(ALCHEMY_RPC);
+
 export const getBrowserProvider = () => {
-  if (!isMetamaskInstalled()) {
-    throw new Error("MetaMask n'est pas installé");
-  }
+  if (!isMetamaskInstalled()) throw new Error("MetaMask n'est pas installé");
   return new ethers.BrowserProvider(window.ethereum);
 };
 
-/**
- * Obtient le signer (MetaMask)
- */
 export const getSigner = async () => {
   const provider = getBrowserProvider();
   return await provider.getSigner();
 };
 
-/**
- * ✅ Contrat en LECTURE SEULE — utilise JsonRpcProvider (Alchemy direct)
- *    Pour : balanceOf(), getUserCards(), getCard(), etc.
- */
 export const getContractReadOnly = () => {
   const provider = getReadOnlyProvider();
   return new ethers.Contract(
-    CONTRACT_ADDRESS, 
-    AndromedaProtocolABI.abi || AndromedaProtocolABI, 
+    CONTRACT_ADDRESS,
+    AndromedaProtocolABI.abi || AndromedaProtocolABI,
     provider
   );
 };
 
-/**
- * ✅ Contrat pour ÉCRIRE — utilise BrowserProvider (MetaMask signe)
- *    Pour : mint(), transfer(), etc.
- */
 export const getContract = async () => {
   const signer = await getSigner();
   return new ethers.Contract(
-    CONTRACT_ADDRESS, 
-    AndromedaProtocolABI.abi || AndromedaProtocolABI, 
+    CONTRACT_ADDRESS,
+    AndromedaProtocolABI.abi || AndromedaProtocolABI,
     signer
   );
 };
 
+// Compat
+export const getProvider = () => getReadOnlyProvider();
+
+/* -------------------------------------------------------------------------- */
+/*                         ✅ LISTING TOKENS (ERC721Enumerable)                */
+/* -------------------------------------------------------------------------- */
+
 /**
- * ✅ Récupère tous les tokenIds d'un utilisateur — LECTURE via Alchemy
+ * ✅ LA correction clé :
+ * Utilise ERC721Enumerable :
+ * balanceOf(owner) + tokenOfOwnerByIndex(owner, i)
+ *
+ * Ça marche même si getUserCards() renvoie vide.
  */
 export const getAllTokenIds = async (address) => {
   try {
     const contract = getContractReadOnly();
-    const tokenIds = await contract.getUserCards(address);
-    return tokenIds.map(id => Number(id));
+    const owner = ethers.getAddress(address);
+
+    // 1) Méthode fiable : ERC721Enumerable
+    try {
+      const bal = await contract.balanceOf(owner); // bigint
+      const n = Number(bal);
+
+      if (Number.isFinite(n) && n > 0) {
+        const ids = await Promise.all(
+          Array.from({ length: n }, (_, i) => contract.tokenOfOwnerByIndex(owner, i))
+        );
+        return ids.map((x) => x.toString());
+      }
+    } catch (e) {
+      console.warn('[getAllTokenIds] ERC721Enumerable failed, fallback...', e?.message);
+    }
+
+    // 2) Fallback : ton helper custom (si jamais)
+    if (contract.getUserCards) {
+      try {
+        const ids = await contract.getUserCards(owner);
+        return (ids || []).map((x) => x.toString());
+      } catch (e2) {
+        console.warn('[getAllTokenIds] getUserCards failed:', e2?.message);
+      }
+    }
+
+    return [];
   } catch (error) {
-    console.error("Erreur getAllTokenIds:", error);
+    console.error('Erreur getAllTokenIds:', error);
     return [];
   }
 };
 
-/**
- * ✅ Récupère les détails d'une carte par tokenId — LECTURE via Alchemy
- */
+/* -------------------------------------------------------------------------- */
+/*                                CARD DETAILS                                */
+/* -------------------------------------------------------------------------- */
+
 export const getCardDetails = async (tokenId) => {
   try {
     const contract = getContractReadOnly();
-    const card = await contract.getCard(tokenId);
+    const id = tokenId?.toString?.() ?? String(tokenId);
+
+    const card = await contract.getCard(id);
+
     return {
-      tokenId: Number(tokenId),
+      tokenId: id,
       name: card.name,
       race: Number(card.race),
       rarity: Number(card.rarity),
@@ -165,7 +156,7 @@ export const getCardDetails = async (tokenId) => {
       previousOwners: card.previousOwners,
       createdAt: Number(card.createdAt),
       lastTransferAt: Number(card.lastTransferAt),
-      isLocked: card.isLocked,
+      isLocked: Boolean(card.isLocked),
       lockUntil: Number(card.lockUntil),
     };
   } catch (error) {
@@ -174,86 +165,70 @@ export const getCardDetails = async (tokenId) => {
   }
 };
 
-// ========== Ancienne fonction getProvider — gardée pour compatibilité ==========
-export const getProvider = () => {
-  return getReadOnlyProvider();
+export const getUserCardsDetailed = async (address) => {
+  const tokenIds = await getAllTokenIds(address);
+  if (!tokenIds || tokenIds.length === 0) return [];
+
+  const cards = await Promise.all(
+    tokenIds.map(async (id) => {
+      const d = await getCardDetails(id);
+      return d ?? { tokenId: String(id), name: `Carte #${id}`, ipfsHash: null, isLocked: false, lockUntil: 0 };
+    })
+  );
+
+  return cards;
 };
 
-/**
- * Formate une adresse
- */
+/* -------------------------------------------------------------------------- */
+/*                                   HELPERS                                  */
+/* -------------------------------------------------------------------------- */
+
 export const formatAddress = (address) => {
   if (!address) return '';
   return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 };
 
-/**
- * Formate un timestamp
- */
 export const formatTimestamp = (timestamp) => {
-  const date = new Date(timestamp * 1000);
+  const date = new Date(Number(timestamp) * 1000);
   return date.toLocaleString('fr-FR');
 };
 
-/**
- * Calcule le temps restant pour un cooldown
- */
 export const getRemainingCooldown = (lastTransactionTime, cooldownDuration = 300) => {
   const now = Math.floor(Date.now() / 1000);
-  const timePassed = now - lastTransactionTime;
+  const timePassed = now - Number(lastTransactionTime || 0);
   const remaining = cooldownDuration - timePassed;
-  
   return remaining <= 0 ? 0 : remaining;
 };
 
-/**
- * Formate le cooldown
- */
 export const formatCooldown = (seconds) => {
-  if (seconds <= 0) return "Disponible";
-  
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  
+  const s = Number(seconds || 0);
+  if (s <= 0) return 'Disponible';
+  const minutes = Math.floor(s / 60);
+  const secs = s % 60;
   return `${minutes}m ${secs}s`;
 };
 
-/**
- * Vérifie si une carte est verrouillée
- */
 export const isCardLocked = (lockUntil) => {
   const now = Math.floor(Date.now() / 1000);
-  return lockUntil > now;
+  return Number(lockUntil || 0) > now;
 };
 
-/**
- * Convertit un hash IPFS en URL
- */
 export const getIPFSUrl = (hash) => {
   if (!hash) return '';
-  const cleanHash = hash.replace('ipfs://', '');
+  const cleanHash = String(hash).replace('ipfs://', '');
   return `https://gateway.pinata.cloud/ipfs/${cleanHash}`;
 };
 
-/**
- * Gère les erreurs de transaction
- */
 export const handleTransactionError = (error) => {
   console.error('Transaction error:', error);
-  
-  if (error.reason) {
-    return `❌ Erreur: ${error.reason}`;
-  }
-  
-  if (error.message) {
-    if (error.message.includes('user rejected')) {
-      return '❌ Transaction annulée';
-    }
-    if (error.message.includes('insufficient funds')) {
-      return '❌ Fonds insuffisants';
-    }
+
+  if (error?.reason) return `❌ Erreur: ${error.reason}`;
+
+  if (error?.message) {
+    if (error.message.includes('user rejected')) return '❌ Transaction annulée';
+    if (error.message.includes('insufficient funds')) return '❌ Fonds insuffisants';
     return `❌ Erreur: ${error.message}`;
   }
-  
+
   return '❌ Erreur lors de la transaction';
 };
