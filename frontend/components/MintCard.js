@@ -6,6 +6,7 @@ import ipfsHashes from '../public/ipfs-hashes.json';
 const ALIEN_RACES = {
   0: {
     name: 'Humans',
+    image: 'http://localhost:3001/images/humans/common.png',
     emoji: '👨‍🚀',
     color: '#6b7280',
     description: 'L\'humanité explorant l\'espace',
@@ -13,6 +14,7 @@ const ALIEN_RACES = {
   },
   1: {
     name: 'Zephyrs',
+    image: 'http://localhost:3001/images/zephyrs/common.png',
     emoji: '💨',
     color: '#06b6d4',
     description: 'Créatures éthérées des tempêtes célestes',
@@ -20,6 +22,7 @@ const ALIEN_RACES = {
   },
   2: {
     name: 'Kraths',
+    image: 'http://localhost:3001/images/kraths/common.png',
     emoji: '⚔️',
     color: '#dc2626',
     description: 'Guerriers blindés d\'une grande force',
@@ -27,6 +30,7 @@ const ALIEN_RACES = {
   },
   3: {
     name: 'Preservers',
+    image: 'http://localhost:3001/images/preservers/common.png',
     emoji: '🌿',
     color: '#16a34a',
     description: 'Gardiens anciens de la nature cosmique',
@@ -34,6 +38,7 @@ const ALIEN_RACES = {
   },
   4: {
     name: 'Synthetics',
+    image: 'http://localhost:3001/images/synthetics/common.png',
     emoji: '🤖',
     color: '#8b5cf6',
     description: 'Entités artificielles ultra-évoluées',
@@ -41,6 +46,7 @@ const ALIEN_RACES = {
   },
   5: {
     name: 'Aquarians',
+    image: 'http://localhost:3001/images/aquarians/common.png',
     emoji: '🌊',
     color: '#0ea5e9',
     description: 'Êtres aquatiques des mondes océans',
@@ -48,6 +54,7 @@ const ALIEN_RACES = {
   },
   6: {
     name: 'Ancients',
+    image: 'http://localhost:3001/images/ancients/common.png',
     emoji: '✨',
     color: '#fbbf24',
     description: 'Civilisation ancienne transcendante',
@@ -568,7 +575,7 @@ export default function MintCard({ account, onMintSuccess }) {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
-              <div style={{ fontSize: '2.5em', marginBottom: '8px' }}>{race.emoji}</div>
+              <img src={race.image} alt={race.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px', border: `2px solid ${race.color}60` }} />
               <div style={{ fontWeight: 'bold', fontSize: '1.1em', marginBottom: '4px', color: race.color }}>
                 {race.name}
               </div>
@@ -673,3 +680,4 @@ export default function MintCard({ account, onMintSuccess }) {
     </div>
   );
 }
+
