@@ -377,7 +377,7 @@ export default function MintCard({ account, onMintSuccess }) {
   return (
     <div className="mint-card-section">
       <div className="section-header">
-        <h2>🚀 Minter une nouvelle carte</h2>
+        <h2><span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em', marginRight:'8px' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><path d="M4 14s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="14" x2="4" y2="17"/><path d="M4 17s2 2 4 2 4-2 4-2"/><path d="M14 3l4 4"/></svg></span>Minter une nouvelle carte</h2>
         <p>Créez une carte spatiale aléatoire avec Chainlink VRF</p>
       </div>
 
@@ -476,10 +476,9 @@ export default function MintCard({ account, onMintSuccess }) {
         </h3>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-          {/* Cooldown */}
           <div style={{ padding: '15px', background: 'rgba(251, 146, 60, 0.1)', border: '1px solid rgba(251, 146, 60, 0.3)', borderRadius: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '1.5em' }}>⏱️</span>
+              <span style={{ fontSize: '1.5em' }}><span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></span>
               <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Cooldown</span>
             </div>
             <div style={{ fontSize: '0.9em', color: 'var(--text-secondary)', marginBottom: '8px' }}>
@@ -495,7 +494,7 @@ export default function MintCard({ account, onMintSuccess }) {
           {/* Limite de cartes */}
           <div style={{ padding: '15px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '1.5em' }}>🎴</span>
+              <span style={{ fontSize: '1.5em' }}><span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><rect x="2" y="5" width="16" height="13" rx="2" ry="2"/><rect x="6" y="2" width="16" height="13" rx="2" ry="2" fill="rgba(99,102,241,0.15)"/><path d="M14 9l-2 4 3-1-3 4" strokeWidth="1.5"/></svg></span></span>
               <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Limite Cartes</span>
             </div>
             <div style={{ fontSize: '0.9em', color: 'var(--text-secondary)', marginBottom: '8px' }}>
@@ -511,7 +510,7 @@ export default function MintCard({ account, onMintSuccess }) {
           {/* Coûts */}
           <div style={{ padding: '15px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '1.5em' }}>💰</span>
+              <span style={{ fontSize: '1.5em' }}><span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4h-4z"/></svg></span></span>
               <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Frais TX</span>
             </div>
             <div style={{ fontSize: '0.9em', color: 'var(--text-secondary)', marginBottom: '8px' }}>
@@ -525,7 +524,7 @@ export default function MintCard({ account, onMintSuccess }) {
           {/* Mode VRF */}
           <div style={{ padding: '15px', background: useTestMint ? 'rgba(168, 85, 247, 0.1)' : 'rgba(139, 92, 246, 0.1)', border: useTestMint ? '1px solid rgba(168, 85, 247, 0.3)' : '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '1.5em' }}>{useTestMint ? '🧪' : '🔗'}</span>
+              <span style={{ fontSize: '1.5em' }}>{useTestMint ? <span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><path d="M9 3h6v7.5l4.5 5.5A2 2 0 0117.293 18H6.707a2 2 0 01-1.5-2.5L9 10.5V3z"/><line x1="9" y1="3" x2="15" y2="3"/><path d="M9 15h6" strokeWidth="1.5"/></svg></span> : <span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>}</span>
               <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Mode Mint</span>
             </div>
             <div style={{ fontSize: '0.9em', color: 'var(--text-secondary)', marginBottom: '8px' }}>

@@ -97,7 +97,7 @@ export default function MyCards({ account, refreshTrigger }) {
     <div className="my-cards-section">
       <div className="section-header">
         <div>
-          <h2>🎴 Ma Collection</h2>
+          <h2>{<span style={{ display:'inline-flex', alignItems:'center', verticalAlign:'middle', width:'1em', height:'1em', marginRight:'8px' }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width:'100%', height:'100%' }}><rect x="2" y="5" width="16" height="13" rx="2" ry="2"/><rect x="6" y="2" width="16" height="13" rx="2" ry="2" fill="rgba(99,102,241,0.15)"/><path d="M14 9l-2 4 3-1-3 4" strokeWidth="1.5"/></svg></span>}Ma Collection</h2>
           <p>{cards.length} carte{cards.length > 1 ? 's' : ''}</p>
         </div>
         <button onClick={loadCards} className="btn btn-refresh">
