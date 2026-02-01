@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESS, NETWORK_CONFIG } from './contractConfig';
-import AndromedaProtocolABI from '../contracts/AndromedaProtocol.json';
+import AndromedaProtocolABI from '../abi/AndromedaProtocol.json';
 
 // ✅ RPC Alchemy direct — utilisé pour toutes les LECTURES (NE PAS TOUCHER)
 const ALCHEMY_RPC = 'https://eth-sepolia.g.alchemy.com/v2/-3XOQCj4AU1nDKEvYqKn4';
